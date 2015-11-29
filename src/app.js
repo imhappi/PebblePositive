@@ -15,7 +15,8 @@ var Clock = require('clock');
 var window = new UI.Window();
 var Vibe = require('ui/vibe');
 var Accel = require('ui/accel');
-
+var msg = msgMaker("Hello :)");
+var alarm = false;
 
 var main = new UI.Card({
   title: 'PebbleLife',
@@ -25,6 +26,21 @@ var main = new UI.Card({
 });
 
 main.show();
+Wakeup.launch(function(e) {
+  if (alarm){
+    msg = msgMaker("Wake up!");
+    startAccelCheck();
+        vibrateUntilShake();
+  }
+    console.log("in wakeup launch");
+    console.log("alarm is: "+alarm);
+    if (e.wakeup) {
+        window.add(msg);
+              Vibe.vibrate('long');
+
+        window.show();
+    }
+});
 
 var menu = new UI.Menu({
     sections: [{
@@ -191,13 +207,12 @@ menu.on('select', function(e) {
     console.log('The item is titled "' + e.item.title + '"');
 });
 var shake = false;
-var alarm = false;
 
 function startAlarm(){
   alarm = true;
   var nextTime = Clock.weekday(day,hour,minute);
   console.log("before wakeup function");
-  wakeupFunction(nextTime,msgMaker("Alarm"));
+  wakeupFunction(nextTime);
 }
 
 /**********
@@ -224,10 +239,13 @@ main.on('click', 'down', function(e) {
 menu.show();
 });
 
+// demo
+var nextTime1 = Clock.weekday(0, 9,32);
 
-var nextTime1 = Clock.weekday(0, 5, 17); //hard code times for now
-var nextTime2 = Clock.weekday(0, 5,18);
-var nextTime3 = Clock.weekday(6, 19,13);
+// testing times
+
+var nextTime2 = Clock.weekday(0, 9,23);
+var nextTime3 = Clock.weekday(0, 9,24);
 var nextTime4 = Clock.weekday(6, 19,14);
 
 function msgMaker(message){
@@ -244,7 +262,8 @@ function msgMaker(message){
 }
 
 
-function wakeupFunction(nextTime,msg){
+function wakeupFunction(nextTime){
+  console.log("in wakeupfunction");
     Wakeup.schedule({
       time: nextTime,
       }, function(e) {
@@ -254,22 +273,6 @@ function wakeupFunction(nextTime,msg){
         console.log('Wakeup set! Event ID: ' + e.id);
       }
     });
-  
-  Wakeup.launch(function(e) {
-    console.log("in wakeup launch");
-    console.log("alarm is: "+alarm);
-    if (e.wakeup) {
-        window.add(msg);
-              Vibe.vibrate('long');
-
-        window.show();
-    }
-});
-
-    /*if (alarm){
-      startAccelCheck();
-        vibrateUntilShake();
-      }*/
 }
 
 function vibrateUntilShake(){
@@ -308,7 +311,10 @@ function startAccelCheck(){
   });
 }
 
-wakeupFunction(nextTime1,msgMaker("Style on point!"));
+msg = msgMaker("Style on point!");
+wakeupFunction(nextTime1);
+/*
 wakeupFunction(nextTime2,msgMaker("You are amazing :)"));
 wakeupFunction(nextTime3,msgMaker("You look great!"));
-wakeupFunction(nextTime4,msgMaker("I appreciate you"));
+wakeupFunction(nextTime4,msgMaker("I appreciate you"));*/
+
